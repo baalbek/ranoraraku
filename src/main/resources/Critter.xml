@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ranoraraku.models.mybatis.CritterMapper">
+
+    <resultMap id="ruleTypeMap" type="ranoraraku.beans.critters.RuleTypeBean">
+        <id column="oid" property="oid" />
+        <result column="description" property="desc" />
+    </resultMap>
+
+    <select id="ruleTypes" resultMap="ruleTypeMap">
+        select * from stockmarket.rule_types order by oid
+    </select>
+
+    <resultMap id="denyRuleMap" type="ranoraraku.beans.critters.DenyRuleBean">
+        <id column="oid" property="oid"/>
+        <result column="value" property="denyValue" />
+        <result column="rtyp" property="rtyp" />
+        <result column="rtyp_desc" property="rtypDesc" />
+        <result column="active" property="active" />
+        <result column="has_memory" property="memory" />
+    </resultMap>
+
+
+    <select id="getDenyRules" resultMap="denyRuleMap">
+        select d.*,r.description as rtyp_desc from stockmarket.deny_rules d
+        join stockmarket.rule_types r on r.oid=d.rtyp where d.group_id=#{value}
+    </select>
+
+
+    <resultMap id="accRuleMap" type="ranoraraku.beans.critters.AcceptRuleBean">
+        <id column="oid" property="oid"/>
+        <result column="value" property="accValue" />
+        <result column="rtyp" property="rtyp" />
+        <result column="rtyp_desc" property="rtypDesc" />
+        <result column="active" property="active" />
+        <collection column="oid"
+                    property="denyRules"
+                    select="getDenyRules"
+                    ofType="ranoraraku.beans.critters.DenyRuleBean"
+                    javaType="java.util.ArrayList"/>
+    </resultMap>
+
+    <select id="getAccRules" resultMap="accRuleMap">
+        select a.*,r.description as rtyp_desc from stockmarket.accept_rules a join
+        stockmarket.rule_types r on r.oid=a.rtyp where a.cid=#{value}
+    </select>
+
+    <resultMap id="critterMap" type="ranoraraku.beans.critters.CritterBean">
+        <id column="oid" property="oid"/>
+        <result column="sell_vol" property="sellVolume" />
+        <result column="purchase_id" property="purchaseId" />
+        <collection column="oid"
+                    property="acceptrules"
+                    select="getAccRules"
+                    ofType="ranoraraku.beans.critters.AcceptRuleBean"
+                    javaType="java.util.ArrayList"/>
+    </resultMap>
+
+    <select id="getCritters" resultMap="critterMap">
+        select * from stockmarket.critter where purchase_id=#{value} and status=7
+        order by oid
+    </select>
+    <resultMap id="salesMap" type="ranoraraku.beans.options.OptionSaleBean">
+        <id column="oid" property="oid"/>
+    </resultMap>
+
+    <select id="getSales" resultMap="salesMap">
+        select * from stockmarket.optionsale where purchase_id=#{value}
+        order by oid
+    </select>
+
+    <resultMap id="purchaseResultMap" type="ranoraraku.beans.options.OptionPurchaseBean">
+        <id column="oid" property="oid"/>
+        <result column="dx" property="dx"/>
+        <result column="price" property="price"/>
+        <result column="buy" property="buyAtPurchase"/>
+        <result column="spot" property="spotAtPurchase"/>
+        <result column="volume" property="volume"/>
+        <result column="status" property="status"/>
+        <result column="ticker" property="ticker"/>
+        <result column="opid" property="optionId"/>
+        <result column="opname" property="optionName"/>
+        <result column="optype" property="optionType"/>
+        <collection column="oid"
+                    property="critters"
+                    select="getCritters"
+                    ofType="ranoraraku.beans.critters.CritterBean"
+                    javaType="java.util.ArrayList"/>
+        <collection column="oid"
+                    property="sales"
+                    select="getSales"
+                    ofType="ranoraraku.beans.options.OptionSaleBean"
+                    javaType="java.util.ArrayList"/>
+    </resultMap>
+
+    <select id="activePurchases" resultMap="purchaseResultMap">
+        select o.*,s.ticker,d.oid,d.opname,d.optype from stockmarket.optionpurchase o
+        join stockmarket.optionx d on d.oid=o.opid
+        join stockmarket.stocktickers s on s.oid=d.stock_id
+        where o.status=1 and o.purchase_type=#{purchaseType}
+        and s.oid in
+        <foreach item="item" index="index" collection="tickerIds"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        order by o.dx
+    </select>
+
+    <select id="activePurchasesAll" resultMap="purchaseResultMap">
+        select o.*,s.ticker,d.opname,d.optype from stockmarket.optionpurchase o
+        join stockmarket.optionx d on d.oid=o.opid
+        join stockmarket.stocktickers s on s.oid=d.stock_id
+        where o.status=1 and o.purchase_type=#{purchaseType}
+        order by s.oid,o.dx
+    </select>
+
+    <select id="findPurchase" resultMap="purchaseResultMap">
+        select o.*,s.ticker,d.opname,d.optype from stockmarket.optionpurchase o
+        join stockmarket.optionx d on d.oid=o.opid
+        join stockmarket.stocktickers s on s.oid=d.stock_id
+        where o.oid=#{purchaseId}
+    </select>
+
+    <select id="findPurchaseForCritId" resultMap="purchaseResultMap">
+        select o.*,s.ticker,d.opname,d.optype from stockmarket.optionpurchase o
+        join stockmarket.optionx d on d.oid=o.opid
+        join stockmarket.stocktickers s on s.oid=d.stock_id
+        join stockmarket.critter c on c.purchase_id=o.oid
+        where c.oid=#{critterId}
+    </select>
+
+    <select id="findPurchaseForAccId" resultMap="purchaseResultMap">
+        select o.*,s.ticker,d.opname,d.optype from stockmarket.optionpurchase o
+        join stockmarket.optionx d on d.oid=o.opid
+        join stockmarket.stocktickers s on s.oid=d.stock_id
+        join stockmarket.critter c on c.purchase_id=o.oid
+        join stockmarket.accept_rules a on a.cid=c.oid
+        where a.oid=#{accId}
+    </select>
+    <!--
+    <select id="selectPurchaseTypeAll" resultMap="purchaseResultMap">
+        select o.*,s.ticker,d.opname from stockmarket.optionpurchase o join stockmarket.optionx d on d.oid=o.opid
+        join stockmarket.stocktickers s on s.oid=d.stock_id
+        where o.purchase_type=#{purchasetype} order by o.dx
+    </select>
+
+    <select id="selectPurchaseType" resultMap="purchaseResultMap">
+        select o.*,s.ticker,d.opname from stockmarket.optionpurchase o join stockmarket.optionx d on d.oid=o.opid
+        join stockmarket.stocktickers s on s.oid=d.stock_id where o.purchase_type=11
+        and exists (select 1 from stockmarket.critter c where c.purchase_id=o.oid and c.status=7 and c.sale_id is null)
+        order by o.dx
+    </select>
+    -->
+
+    <update id="toggleAcceptRule">
+        update stockmarket.accept_rules set active=#{isActive} where oid=#{oid}
+    </update>
+    <update id="toggleDenyRule">
+        update stockmarket.deny_rules set active=#{isActive} where oid=#{oid}
+    </update>
+
+    <!--  oid | opid | dx | price | volume | status | transaction_cost | purchase_type | spotAtPurchase | buy -->
+    <insert id="insertPurchase"
+            parameterType="ranoraraku.beans.options.OptionPurchaseBean"
+            useGeneratedKeys="true"
+            keyProperty="oid" >
+        insert into stockmarket.optionpurchase (opid, dx, price, volume, status, purchase_type, spot, buy)
+        values (#{optionId}, #{dx}, #{price}, #{volume}, #{status}, #{purchaseType}, #{spotAtPurchase}, #{buyAtPurchase})
+    </insert>
+
+    <!-- oid | status | critter_type | sell_vol | purchase_id | sale_id -->
+    <insert id="insertCritter"
+            parameterType="ranoraraku.beans.critters.CritterBean"
+            useGeneratedKeys="true"
+            keyProperty="oid" >
+        insert into stockmarket.critter (status,critter_type,sell_vol,purchase_id)
+        values (#{status},#{critterType},#{sellVolume},#{purchaseId})
+    </insert>
+
+    <!-- oid | rtyp | value_1 | value_2 | level_1 | level_2 | active | name | cid -->
+    <insert id="insertGradientRule"
+            parameterType="ranoraraku.beans.critters.GradientRuleBean"
+            useGeneratedKeys="true"
+            keyProperty="oid" >
+        insert into stockmarket.gradient_rules (rtyp,value_1,value_2,level_1,level_2,cid)
+        values (#{rtyp},#{value1},#{value2},#{level1},#{level2},#{cid})
+    </insert>
+
+    <!-- oid | value | rtyp | active | description | cid -->
+    <insert id="insertAcceptRule"
+            parameterType="ranoraraku.beans.critters.AcceptRuleBean"
+            useGeneratedKeys="true"
+            keyProperty="oid" >
+        insert into stockmarket.accept_rules (value,rtyp,active,cid)
+        values (#{accValue},#{rtyp},#{active},#{cid})
+    </insert>
+
+
+    <!-- oid | value | rtyp | group_id | active | has_memory -->
+    <insert id="insertDenyRule"
+            parameterType="ranoraraku.beans.critters.DenyRuleBean"
+            useGeneratedKeys="true"
+            keyProperty="oid" >
+        insert into stockmarket.deny_rules (value,rtyp,group_id,active,has_memory)
+        values (#{denyValue},#{rtyp},#{groupId},#{active},#{memory})
+    </insert>
+    
+    <update id="registerCritterClosedWithSale"
+            parameterType="ranoraraku.beans.critters.CritterBean"
+            flushCache="true"
+            statementType="PREPARED">
+        update stockmarket.critter set status=9, sale_id=#{saleId} where oid=#{oid}
+    </update>
+    <update id="registerPurchaseFullySold"
+            parameterType="ranoraraku.beans.options.OptionPurchaseBean"
+            flushCache="true"
+            statementType="PREPARED">
+        update stockmarket.optionpurchase set status=2 where oid=#{oid}
+    </update>
+
+    <insert id="insertCritterSale"
+            parameterType="ranoraraku.beans.options.OptionSaleBean"
+            useGeneratedKeys="true"
+            keyProperty="oid" >
+        insert into stockmarket.optionsale (purchase_id,dx,price,volume)
+        values (#{purchaseOid},#{dx},#{price},#{volume})
+    </insert>
+</mapper>

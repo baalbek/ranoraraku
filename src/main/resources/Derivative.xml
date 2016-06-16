@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ranoraraku.models.mybatis.DerivativeMapper">
+
+    <!-- BEGIN StockBean with DerivativeBean -->
+    <resultMap id="stockWithDerivativesMap" type="ranoraraku.beans.StockBean">
+        <id column="oid" property="oid" jdbcType="INTEGER" />
+        <result column="ticker" property="ticker"/>
+        <result column="company_name" property="companyName"/>
+        <result column="status" property="status"/>
+        <collection column="oid"
+                    property="derivatives"
+                    ofType="ranoraraku.beans.options.DerivativeBean"
+                    javaType="java.util.ArrayList">
+            <id column="derivative_id" property="oid" jdbcType="INTEGER" />
+            <result column="opname" property="ticker"/>
+            <result column="strike" property="x"/>
+            <result column="exp_date" property="expirySql"/>
+            <result column="optype" property="opTypeStr"/>
+            <result column="series" property="series"/>
+        </collection>
+    </resultMap>
+
+
+    <select id="derivatives" resultMap="stockWithDerivativesMap">
+        select t.oid,t.ticker,t.company_name,o.oid as derivative_id,o.opname,o.strike,
+        o.exp_date,o.optype,o.series from stockmarket.stocktickers t
+        join stockmarket.optionx o on o.stock_id=t.oid
+        where o.exp_date &gt; #{fromDx}
+        and t.oid in
+        <foreach item="item" index="index" collection="tickerIds"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+
+    <select id="calls" resultMap="stockWithDerivativesMap">
+        select t.oid,t.ticker,t.company_name,o.oid as derivative_id,o.opname,o.strike,
+        o.exp_date,o.optype,o.series from stockmarket.stocktickers t
+        join stockmarket.optionx o on o.stock_id=t.oid
+        where t.oid = #{tickerId}
+        and o.optype = 'c'
+        and o.exp_date &gt; #{fromDx}
+    </select>
+
+    <select id="puts" resultMap="stockWithDerivativesMap">
+        select t.oid,t.ticker,t.company_name,o.oid as derivative_id,o.opname,o.strike,
+        o.exp_date,o.optype,o.series from stockmarket.stocktickers t
+        join stockmarket.optionx o on o.stock_id=t.oid
+        where t.oid = #{tickerId}
+        and o.optype = 'p'
+        and o.exp_date &gt; #{fromDx}
+    </select>
+
+    <!-- oid | opname | strike | exp_date | optype | stock_id | series -->
+
+    <insert id="insertDerivative"
+            parameterType="ranoraraku.beans.options.DerivativeBean"
+            useGeneratedKeys="true"
+            keyProperty="oid" >
+        insert into stockmarket.optionx (opname, strike, exp_date, optype, stock_id, series)
+        values (#{ticker}, #{x}, #{expirySql}, #{opTypeStr}, #{stockId}, #{series})
+    </insert>
+    <!-- END StockBean with DerivativeBean -->
+
+    <!-- BEGIN SpotAndOptionsBean -->
+    <!-- days   | stock_id  | ticker | opx_id   |  opname  |
+         strike |  exp_date | optype | price_id |  buy     |
+         sell   | spot_id   | dx     | tm       |  spot -->
+    <resultMap id="spotWithOptionPricesMap" type="ranoraraku.beans.options.SpotOptionPriceBean">
+        <id column="price_id" property="priceId" jdbcType="INTEGER" />
+        <result column="spot_id" property="spotId" jdbcType="INTEGER" />
+        <result column="stock_id" property="stockId" jdbcType="INTEGER" />
+        <result column="ticker" property="ticker" />
+        <result column="opx_id" property="opxId" jdbcType="INTEGER" />
+        <result column="opname" property="opxName" />
+        <result column="days" property="days" />
+        <result column="strike"  property="strike" />
+        <result column="exp_date"  property="sqlExpDate" />
+        <result column="optype"  property="opxType" />
+        <result column="buy"  property="buy" />
+        <result column="sell"  property="sell" />
+        <result column="dx"  property="sqlDx" />
+        <result column="tm"  property="sqlTm" />
+        <result column="spot"  property="spot" />
+    </resultMap>
+    <select id="spotsOprices" resultMap="spotWithOptionPricesMap">
+        select price_id,spot_id,stock_id,ticker,opx_id,opname,days,strike,exp_date,
+        optype,buy,sell,dx,tm,spot from stockmarket.v_spot_opx
+        order by dx,tm
+    </select>
+    <select id="spotsOpricesStockId" resultMap="spotWithOptionPricesMap">
+        select price_id,spot_id,stock_id,ticker,opx_id,opname,days,strike,exp_date,
+        optype,buy,sell,dx,tm,spot from stockmarket.v_spot_opx
+        where stock_id=#{stockId} and dx between #{fromDx} and #{toDx}
+        order by dx,tm
+    </select>
+    <select id="spotsOpricesStockIds" resultMap="spotWithOptionPricesMap">
+        select price_id,spot_id,stock_id,ticker,opx_id,opname,days,strike,exp_date,
+        optype,buy,sell,dx,tm,spot from stockmarket.v_spot_opx
+        where stock_id in
+        <foreach item="item" index="index" collection="stockIds"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and dx between #{fromDx} and #{toDx}
+        order by dx,tm
+    </select>
+    <select id="spotsOpricesStockTix" resultMap="spotWithOptionPricesMap">
+        select price_id,spot_id,stock_id,ticker,opx_id,opname,days,strike,exp_date,
+        optype,buy,sell,dx,tm,spot from stockmarket.v_spot_opx
+        where ticker in
+        <foreach item="item" index="index" collection="stockTix"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and dx between #{fromDx} and #{toDx}
+        order by dx,tm
+    </select>
+    <select id="spotsOpricesOpxId" resultMap="spotWithOptionPricesMap">
+        select price_id,spot_id,stock_id,ticker,opx_id,opname,days,strike,exp_date,
+        optype,buy,sell,dx,tm,spot from stockmarket.v_spot_opx
+        where opx_id=#{opxId} 
+        order by dx,tm
+    </select>
+    <insert id="insertBlackScholes"
+            parameterType="ranoraraku.beans.options.SpotOptionPriceBean">
+        insert into stockmarket.iv_blackscholes (oid,iv_buy,iv_sell)
+        values (#{oid},#{ivBuy},#{ivSell})
+    </insert>
+
+    <!--
+    <select id="spotsOpricesOpxIds" resultMap="spotWithOptionPricesMap">
+        select price_id,spot_id,stock_id,ticker,opx_id,opname,strike,exp_date,
+        optype,buy,sell,dx,tm,spot from stockmarket.v_spot_opx
+        where opx_id in
+        <foreach item="item" index="index" collection="tickerIds"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        order by price_id,dx,tm
+    </select>
+    -->
+
+    <!-- END SpotAndOptionsBean -->
+
+    <!-- BEGIN Option prices and spots -->
+    <!--
+    <resultMap id="spotWithOptionPricesMap" type="ranoraraku.beans.StockPriceBean">
+        <id column="spot_id" property="oid" jdbcType="INTEGER" />
+        <collection column="spot_id"
+                    property="optionPrices"
+                    ofType="ranoraraku.beans.options.DerivativePriceBean"
+                    javaType="java.util.ArrayList">
+            <id column="price_id" property="oid" jdbcType="INTEGER" />
+        </collection>
+    </resultMap>
+    <select id="spotWithOptionPrices" resultMap="spotWithOptionPricesMap">
+        select spot_id,price_id from stockmarket.v_spot_opx
+    </select>
+    -->
+
+    <insert id="insertDerivativePrice"
+            parameterType="ranoraraku.beans.options.DerivativePriceBean"
+            useGeneratedKeys="true"
+            keyProperty="oid" >
+            insert into stockmarket.optionprice (spot_id,opx_id,buy,sell) 
+            values (#{stockPriceId},#{derivativeId},#{buy},#{sell})
+    </insert>
+    <!--
+        OPTIONPRICE
+        Column  |  Type   |                    Modifiers
+        oid     | integer | not null default nextval('iv_oid_seq'::regclass)
+        spot_id | integer | not null
+        opx_id  | integer | not null
+        buy     | price   | not null
+        sell    | price   | not null
+
+
+        SPOT 
+        Column  |          Type          |                     Modifiers
+        oid      | integer                | not null default nextval('spot_oid_seq'::regclass)
+        stock_id | integer                | not null
+        dx       | date                   | not null
+        tm       | time without time zone | not null
+        price    | price                  | not null
+    -->
+    <insert id="insertSpot"
+            parameterType="ranoraraku.beans.StockPriceBean"
+            useGeneratedKeys="true"
+            keyProperty="oid" >
+        insert into stockmarket.spot (stock_id,dx,tm,price) 
+        values (#{stockId},#{dx},#{sqlTime},#{value})
+    </insert>
+
+    <select id="countDerivative" resultType="int" parameterType="string">
+        select count(1) from stockmarket.optionx where opname=#{value}
+    </select>
+
+    <resultMap id="derivativeMap" type="ranoraraku.beans.options.DerivativeBean">
+        <result column="oid" property="oid"/>
+        <result column="opname" property="ticker"/>
+        <result column="strike" property="x"/>
+        <result column="exp_date" property="expirySql"/>
+        <result column="optype" property="opTypeStr"/>
+        <result column="stock_id" property="stockId"/>
+    </resultMap>
+
+    <select id="findDerivative" resultMap="derivativeMap" parameterType="string">
+        select oid,opname,strike,exp_date,optype,stock_id,series
+        from stockmarket.optionx where opname=#{value}
+    </select>
+
+    <select id="findSpotId" resultType="Integer" parameterType="ranoraraku.beans.StockPriceBean">
+        select oid from stockmarket.spot where stock_id=#{stockId} and dx=#{dx} and tm=#{sqlTime}
+    </select>
+
+    <select id="countIvForSpot" resultType="int" parameterType="ranoraraku.beans.StockPriceBean">
+        select count(1) from stockmarket.iv where spot_id=#{oid}
+    </select>
+    <select id="countOpxPricesForSpot" resultType="int" parameterType="ranoraraku.beans.StockPriceBean">
+        select count(1) from stockmarket.optionprice where spot_id=#{oid}
+    </select>
+
+    <!-- END Option prices and spots -->
+
+</mapper>

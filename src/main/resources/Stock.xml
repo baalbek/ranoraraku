@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ranoraraku.models.mybatis.StockMapper">
+
+
+    <!--
+    oid    | integer | not null default nextval('stockprice_oid_seq'::regclass)
+    ticker | ticker  |
+    dx     | date    | default now()
+    opn    | price   |
+    hi     | price   |
+    lo     | price   |
+    cls    | price   |
+    vol    | volume
+    -->
+
+    <resultMap id="stockPriceMap"
+               type="ranoraraku.beans.StockPriceBean">
+        <!--
+        <result column="ticker_id" property="tickerId"/>
+        <id column="oid" property="oid" jdbcType="INTEGER" />
+        -->
+        <result column="dx" property="dx"/>
+        <result column="opn" property="opn"/>
+        <result column="hi" property="hi"/>
+        <result column="lo" property="lo"/>
+        <result column="cls" property="cls"/>
+        <result column="vol" property="volume"/>
+    </resultMap>
+
+    <select id="selectStockPrices" parameterType="map" resultMap="stockPriceMap">
+        select oid,dx,opn,hi,lo,cls,vol from stockmarket.stockprice
+        where ticker_id=#{tickerId} and dx &gt; #{fromDx} order by dx
+    </select>
+
+
+    <select id="selectMaxDate" resultType="hashMap">
+        select ticker_id,max(dx) as max_dx from stockmarket.stockprice group by ticker_id
+    </select>
+
+
+    <insert id="insertStockPrice"
+            parameterType="ranoraraku.beans.StockPriceBean"
+            useGeneratedKeys="true"
+            keyProperty="oid" >
+        insert into stockmarket.stockprice (ticker_id, dx, opn, hi, lo, cls, vol)
+        values (#{tickerId}, #{dx}, #{opn}, #{hi}, #{lo}, #{cls}, #{volume})
+    </insert>
+
+    <!--
+        oid | ticker | company_name | status
+
+        1 | NHY    | Norsk hydro  |      1
+        2 | STL    | StatoilHydro |      1
+    -->
+
+    <resultMap id="stocksMap"
+               type="ranoraraku.beans.StockBean">
+        <id column="oid" property="oid" jdbcType="INTEGER" />
+        <result column="ticker" property="ticker"/>
+        <result column="company_name" property="companyName"/>
+        <result column="status" property="status"/>
+        <result column="ticker_category" property="tickerCategory"/>
+    </resultMap>
+
+    <select id="selectStocks" parameterType="map" resultMap="stocksMap">
+        select * from stockmarket.stocktickers where status=1 order by ticker
+    </select>
+
+
+    <!--
+    <resultMap id="stockWithPricesMap"
+               type="ranoraraku.beans.StockBean">
+        <id column="oid" property="oid" jdbcType="INTEGER" />
+        <result column="ticker" property="ticker"/>
+        <result column="company_name" property="companyName"/>
+        <result column="status" property="status"/>
+        <result column="ticker_category" property="tickerCategory"/>
+        <collection column="oid"
+                    property="prices"
+                    ofType="ranoraraku.beans.StockPriceBean"
+                    javaType="java.util.ArrayList">
+            <id column="price_id" property="oid" jdbcType="INTEGER" />
+            <result column="dx" property="dx"/>
+            <result column="opn" property="opn"/>
+            <result column="hi" property="hi"/>
+            <result column="lo" property="lo"/>
+            <result column="cls" property="cls"/>
+            <result column="vol" property="volume"/>
+        </collection>
+    </resultMap>
+
+
+    <select id="selectStocksWithPrices" parameterType="map" resultMap="stockWithPricesMap">
+        select t.oid,t.ticker,t.company_name,t.status,t.ticker_category,
+        s.oid as price_id,s.dx,s.opn,s.hi,s.lo,s.cls,s.vol from
+        stockmarket.stocktickers t join stockmarket.stockprice s on s.ticker_id = t.oid
+        where t.status=1 and s.dx &gt; #{fromDx}
+        and t.oid in
+        <foreach item="item" index="index" collection="tickerIds"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        order by t.ticker,s.dx
+    </select>
+
+    <select id="selectStockWithPrices" parameterType="map" resultMap="stockWithPricesMap">
+        select t.oid,t.ticker,t.company_name,t.status,t.ticker_category,
+        s.oid as price_id,s.dx,s.opn,s.hi,s.lo,s.cls,s.vol from
+        stockmarket.stocktickers t join stockmarket.stockprice s on s.ticker_id = t.oid
+        where t.status=1 and s.dx &gt; #{fromDx}
+        and t.oid=#{oid}
+        order by s.dx
+    </select>
+    -->
+</mapper>
