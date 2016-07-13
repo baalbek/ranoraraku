@@ -5,7 +5,7 @@
 
     <resultMap id="ruleTypeMap" type="ranoraraku.beans.critters.RuleTypeBean">
         <id column="oid" property="oid" />
-        <result column="description" property="desc" />
+        <result column="locationName" property="desc" />
     </resultMap>
 
     <select id="ruleTypes" resultMap="ruleTypeMap">
@@ -23,7 +23,7 @@
 
 
     <select id="getDenyRules" resultMap="denyRuleMap">
-        select d.*,r.description as rtyp_desc from stockmarket.deny_rules d
+        select d.*,r.locationName as rtyp_desc from stockmarket.deny_rules d
         join stockmarket.rule_types r on r.oid=d.rtyp where d.group_id=#{value}
     </select>
 
@@ -42,7 +42,7 @@
     </resultMap>
 
     <select id="getAccRules" resultMap="accRuleMap">
-        select a.*,r.description as rtyp_desc from stockmarket.accept_rules a join
+        select a.*,r.locationName as rtyp_desc from stockmarket.accept_rules a join
         stockmarket.rule_types r on r.oid=a.rtyp where a.cid=#{value}
     </select>
 
@@ -187,7 +187,7 @@
         values (#{rtyp},#{value1},#{value2},#{level1},#{level2},#{cid})
     </insert>
 
-    <!-- oid | value | rtyp | active | description | cid -->
+    <!-- oid | value | rtyp | active | locationName | cid -->
     <insert id="insertAcceptRule"
             parameterType="ranoraraku.beans.critters.AcceptRuleBean"
             useGeneratedKeys="true"
