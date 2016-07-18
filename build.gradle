@@ -18,35 +18,3 @@ dependencies {
 
 def jarFile = new File("$libsDir/ranoraraku-${version}.jar")
 
-task cj(dependsOn: [build]) << {
-    copy {
-        into '../maunaloa/dist' from jarFile
-    }
-    copy {
-        into '../netfondsjanitor/dist' from jarFile
-    }
-}
-
-/*
-task cj(type: Copy, dependsOn: [build]) {
-into '../maunaloa/dist' from new File("$libsDir/ranoraraku-${version}.jar")
-into '../netfondsjanitor/dist' from new File("$libsDir/ranoraraku-${version}.jar")
-into '../maunakea/dist' from new File("$libsDir/ranoraraku-${version}.jar")
-}
-
-task myCustomTask << {
-
-copy {
-    from 'sourcePath/folderA'
-    into 'targetPath/folderA'
-}
-
-copy {
-    from 'sourcePath/folderB'
-    into 'targetPath/folderB'
-}
-}
-//*/
-
-
-//task buildAndCopy(dependsOn: [build,cj])

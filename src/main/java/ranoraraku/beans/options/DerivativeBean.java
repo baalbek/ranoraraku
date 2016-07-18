@@ -3,7 +3,6 @@ package ranoraraku.beans.options;
 import oahu.financial.Derivative;
 import oahu.financial.Stock;
 
-//import java.util.Date;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.regex.Matcher;
@@ -27,7 +26,7 @@ public class DerivativeBean implements Derivative {
 
 
     public DerivativeBean(String ticker,
-                          int opType,
+                          OptionType opType,
                           double x,
                           LocalDate expiry,
                           Stock stock) {
@@ -45,7 +44,7 @@ public class DerivativeBean implements Derivative {
         buf.append("\n\tParent: ").append(parent == null ? "none" : "parent") // parent.getTicker())
         */
            buf.append("\n\texpiry: ").append(getExpiry())
-           .append("\n\toption type: ").append(getOpType() == CALL ? "apply" : "put")
+           .append("\n\toption type: ").append(getOpType() == OptionType.CALL ? "apply" : "put")
            .append("\n\tx: ").append(getX())
            //.append("\n\tbuy ").append(getBuy())
            //.append("\n\tsell ").append(getSell())
@@ -110,26 +109,26 @@ public class DerivativeBean implements Derivative {
     //--------------------------------------------------
     //------------- OpType
     //--------------------------------------------------
-    private int opType;
+    private OptionType opType;
     @Override
-    public int getOpType() {
+    public OptionType getOpType() {
         return opType;
     }
 
 
-    public void setOpType(int value) {
+    public void setOpType(OptionType value) {
             opType = value;
     }
 
     public String getOpTypeStr() {
-        return getOpType() == 1 ? "c" : "p";
+        return getOpType() == OptionType.CALL ? "c" : "p";
     }
     public void setOpTypeStr(String value) {
         if (value.equals("c")) {
-            setOpType(1);
+            setOpType(OptionType.CALL);
         }
         else {
-            setOpType(2);
+            setOpType(OptionType.PUT);
         }
     }
 
