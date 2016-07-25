@@ -37,6 +37,15 @@ public class DerivativePriceBean implements DerivativePrice {
         this.calculator = calculator;
     }
 
+    public DerivativePriceBean(Derivative derivative,
+                               double buy,
+                               double sell,
+                               OptionCalculator calculator) {
+        this.derivative = derivative;
+        this.buy = buy;
+        this.sell = sell;
+        this.calculator = calculator;
+    }
     @Override
     public double getBuy() {
         return buy;
@@ -75,6 +84,10 @@ public class DerivativePriceBean implements DerivativePrice {
         return stockPrice;
     }
 
+    public void setStockPrice(StockPrice stockPrice) {
+        this.stockPrice = stockPrice;
+    }
+
     public int getStockPriceId() {
         return stockPrice == null ? -1 : stockPrice.getOid();
     }
@@ -99,9 +112,6 @@ public class DerivativePriceBean implements DerivativePrice {
         return calculator.iv(this,Derivative.SELL);
     }
 
-    public void setStockPrice(StockPrice stockPrice) {
-        this.stockPrice = stockPrice;
-    }
 
     public void setBuy(double buy) {
         this.buy = buy;

@@ -14,10 +14,7 @@ import ranoraraku.utils.MyBatisUtils;
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -31,7 +28,7 @@ public class StockMarketReposImpl implements StockMarketRepository {
     private List<Stock> stocks;
 
     @Override
-    public Derivative findDerivative(String derivativeTicker) {
+    public Optional<Derivative> findDerivative(String derivativeTicker) {
         if (idLookup == null) {
             populate();
         }
@@ -48,7 +45,13 @@ public class StockMarketReposImpl implements StockMarketRepository {
             return result;
         };
 
-        return (Derivative)MyBatisUtils.withSession(c);
+        Object retResult = MyBatisUtils.withSession(c);
+        if (retResult == null) {
+            return Optional.empty();
+        }
+        else {
+            return Optional.of((Derivative)retResult);
+        }
     }
 
     @Override
