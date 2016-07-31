@@ -18,3 +18,8 @@ dependencies {
 
 def jarFile = new File("$libsDir/ranoraraku-${version}.jar")
 
+//*
+task copyToParentProject(type: Copy, dependsOn: jar) {
+    into parentDist from jarFile
+}
+//*/
