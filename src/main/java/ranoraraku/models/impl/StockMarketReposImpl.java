@@ -38,7 +38,7 @@ public class StockMarketReposImpl implements StockMarketRepository {
             Derivative result = mapper.findDerivative(derivativeTicker);
 
             if (result == null) {
-                log.warn(String.format("[%s] No derivative in options", derivativeTicker));
+                log.warn(String.format("[%s] No derivative in database", derivativeTicker));
                 return null;
             }
             ((DerivativeBean) result).setStock(idLookup.get(((DerivativeBean) result).getStockId()));
@@ -80,7 +80,7 @@ public class StockMarketReposImpl implements StockMarketRepository {
         return MyBatisUtils.withSession((session) -> {
             Stock stock = tickerLookup.get(ticker);
             if (stock == null) {
-                log.warn(String.format("[%s] No stock in options", ticker));
+                log.warn(String.format("[%s] No stock in database", ticker));
                 return null;
             }
             StockMapper mapper = session.getMapper(StockMapper.class);

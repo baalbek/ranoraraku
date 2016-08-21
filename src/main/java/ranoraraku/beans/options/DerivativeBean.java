@@ -132,6 +132,18 @@ public class DerivativeBean implements Derivative {
         }
     }
 
+    //--------------------------------------------------
+    //--------------- Life Cycle -----------------------
+    //--------------------------------------------------
+    private LifeCycle lifeCycle;
+    @Override
+    public LifeCycle getLifeCycle() {
+        return lifeCycle;
+    }
+    public void setLifeCycle(LifeCycle lifeCycle) {
+        this.lifeCycle = lifeCycle;
+    }
+
 
     //--------------------------------------------------
     //------------- Series
