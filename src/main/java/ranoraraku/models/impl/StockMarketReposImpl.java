@@ -28,12 +28,22 @@ public class StockMarketReposImpl implements StockMarketRepository {
     private List<Stock> stocks;
 
     @Override
+    public void insertDerivative(Derivative derivative) {
+        DerivativeBean bean = (DerivativeBean)derivative;
+
+        MyBatisUtils.withSessionConsumer((session) -> {
+            DerivativeMapper dmapper = session.getMapper(DerivativeMapper.class);
+            dmapper.insertDerivative(bean);
+        });
+    }
+
+    @Override
     public Optional<Derivative> findDerivative(String derivativeTicker) {
         if (idLookup == null) {
             populate();
         }
 
-        Function<SqlSession,Object> c = (session) -> {
+        Function<SqlSession,Derivative> c = (session) -> {
             DerivativeMapper mapper = session.getMapper(DerivativeMapper.class);
             Derivative result = mapper.findDerivative(derivativeTicker);
 
@@ -45,12 +55,12 @@ public class StockMarketReposImpl implements StockMarketRepository {
             return result;
         };
 
-        Object retResult = MyBatisUtils.withSession(c);
+        Derivative retResult = MyBatisUtils.withSession(c);
         if (retResult == null) {
             return Optional.empty();
         }
         else {
-            return Optional.of((Derivative)retResult);
+            return Optional.of(retResult);
         }
     }
 
@@ -76,7 +86,6 @@ public class StockMarketReposImpl implements StockMarketRepository {
         if (tickerLookup == null) {
             populate();
         }
-        //Function<SqlSession,List<StockPrice>> c = (session) -> {
         return MyBatisUtils.withSession((session) -> {
             Stock stock = tickerLookup.get(ticker);
             if (stock == null) {
