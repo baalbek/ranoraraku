@@ -15,6 +15,7 @@ import ranoraraku.utils.MyBatisUtils;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -28,13 +29,13 @@ public class StockMarketReposImpl implements StockMarketRepository {
     private List<Stock> stocks;
 
     @Override
-    public void insertDerivative(Derivative derivative) {
+    public void insertDerivative(Derivative derivative, Consumer<Exception> errorHandler) {
         DerivativeBean bean = (DerivativeBean)derivative;
 
         MyBatisUtils.withSessionConsumer((session) -> {
             DerivativeMapper dmapper = session.getMapper(DerivativeMapper.class);
             dmapper.insertDerivative(bean);
-        });
+        }, errorHandler);
     }
 
     @Override
