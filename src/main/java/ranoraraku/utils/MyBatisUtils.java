@@ -1,6 +1,7 @@
 package ranoraraku.utils;
 
 import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
@@ -47,14 +48,19 @@ public class MyBatisUtils {
     public static SqlSession getSession() {
         return getFactory().openSession();
     }
-    public static <T> T withSession(Function<SqlSession,T> fn) {
+    public static <T> T withSession(Function<SqlSession,T> fn, Consumer<Exception> errorHandler) {
         SqlSession session = null;
         try {
             session = getSession();
             return fn.apply(session);
         }
         catch (Exception ex) {
-            Logger.getLogger(MyBatisUtils.class.getName()).log(Level.SEVERE, null, ex);
+            if (errorHandler == null){
+                Logger.getLogger(MyBatisUtils.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            else {
+                errorHandler.accept(ex);
+            }
             return null;
         }
         finally {
@@ -64,15 +70,23 @@ public class MyBatisUtils {
             }
         }
     }
+    public static <T> T withSession(Function<SqlSession,T> fn) {
+        return withSession(fn,null);
+    }
 
-    public static void withSessionConsumer(Consumer<SqlSession> consumer) {
+    public static void withSessionConsumer(Consumer<SqlSession> consumer, Consumer<Exception> errorHandler) {
         SqlSession session = null;
         try {
             session = getSession();
             consumer.accept(session);
         }
         catch (Exception ex) {
-            Logger.getLogger(MyBatisUtils.class.getName()).log(Level.SEVERE, null, ex);
+            if (errorHandler == null){
+                Logger.getLogger(MyBatisUtils.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            else {
+                errorHandler.accept(ex);
+            }
         }
         finally {
             if (session != null) {
@@ -80,6 +94,9 @@ public class MyBatisUtils {
                 session.close();
             }
         }
+    }
+    public static void withSessionConsumer(Consumer<SqlSession> consumer) {
+        withSessionConsumer(consumer,null);
     }
 
 }
