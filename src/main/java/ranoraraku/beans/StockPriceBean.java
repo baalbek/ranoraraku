@@ -30,7 +30,7 @@ public class StockPriceBean implements StockPrice {
     private double cls;
     private double marketValue;
     private int volume;
-    private int oid;
+    private int oid = -1;
     private List<DerivativePrice> optionPrices;
 
 
