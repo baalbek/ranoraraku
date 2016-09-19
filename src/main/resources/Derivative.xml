@@ -224,6 +224,26 @@
         select count(1) from stockmarket.optionprice where spot_id=#{oid}
     </select>
 
+
+    <resultMap id="spotOptionPriceSummaryMap" type="ranoraraku.beans.options.SpotOptionPriceSummaryBean">
+        <result column="stock_id" property="stockId" jdbcType="INTEGER" />
+        <result column="ticker" property="ticker" />
+        <result column="dx"  property="sqlDx" />
+    </resultMap>
+
+    <select id="spotOptionPriceSummary" resultMap="spotOptionPriceSummaryMap">
+        select t.ticker,s.stock_id,date_part('year',s.dx) as year,date_part('month',s.dx) as month,
+        count(1) as num_prices,max(s.dx) as max_dx
+        from stockmarket.spot s
+        join stockmarket.stocktickers t on t.oid=s.stock_id
+        group by t.ticker,s.stock_id,date_part('year',s.dx),date_part('month',s.dx)
+        order by s.stock_id,date_part('year',s.dx),date_part('month',s.dx)
+    <!--
+        select t.ticker,s.stock_id,max(s.dx) as dx from stockmarket.spot s
+        join stockmarket.stocktickers t on t.oid=s.stock_id group by t.ticker,s.stock_id
+    -->
+    </select>
+
     <!-- END Option prices and spots -->
 
 </mapper>

@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 import ranoraraku.beans.StockPriceBean;
 import ranoraraku.beans.options.DerivativeBean;
 import ranoraraku.beans.options.DerivativePriceBean;
+import ranoraraku.beans.options.SpotOptionPriceSummaryBean;
 
 import java.sql.Date;
 import java.util.List;
@@ -49,6 +50,7 @@ public interface DerivativeMapper {
     List<SpotOptionPrice> spotsOpricesStockTix(@Param("stockTix") List<String> stockTix,
                                                @Param("fromDx") Date fromDx,
                                                @Param("toDx") Date toDx);
+    List<SpotOptionPriceSummaryBean> spotOptionPriceSummary();
     void insertBlackScholes(@Param("oid") int oid,
                             @Param("ivBuy") double ivBuy,
                             @Param("ivSell") double ivSell);
