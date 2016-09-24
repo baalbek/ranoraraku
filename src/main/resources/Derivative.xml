@@ -228,7 +228,10 @@
     <resultMap id="spotOptionPriceSummaryMap" type="ranoraraku.beans.options.SpotOptionPriceSummaryBean">
         <result column="stock_id" property="stockId" jdbcType="INTEGER" />
         <result column="ticker" property="ticker" />
-        <result column="dx"  property="sqlDx" />
+        <result column="year" property="year" />
+        <result column="month" property="month" />
+        <result column="num_prices" property="numPrices" />
+        <result column="max_dx"  property="sqlMaxDx" />
     </resultMap>
 
     <select id="spotOptionPriceSummary" resultMap="spotOptionPriceSummaryMap">
