@@ -21,10 +21,13 @@ import java.util.logging.Logger;
  */
 public class MyBatisUtils {
 
-    private static final String conf = "mybatis.conf.xml";
+    private static String conf = "mybatis.conf.xml";
 
     private static SqlSessionFactory _factory = null;
 
+    public static void setConfigFile(String configFile) {
+        conf = configFile;
+    }
     public static SqlSessionFactory getFactory() {
         if (_factory == null) {
             Reader reader = null;

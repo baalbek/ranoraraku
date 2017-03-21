@@ -28,6 +28,10 @@ public class StockMarketReposImpl implements StockMarketRepository {
     private HashMap<String,Stock> tickerLookup;
     private List<Stock> stocks;
 
+    public void setMybatisConfigFile(String mybatisConfigFile) {
+       MyBatisUtils.setConfigFile(mybatisConfigFile);
+    }
+
     @Override
     public void insertDerivative(Derivative derivative, Consumer<Exception> errorHandler) {
         DerivativeBean bean = (DerivativeBean)derivative;
