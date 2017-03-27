@@ -2,7 +2,7 @@ apply plugin: 'java'
 
 group = 'rcstadheim'
 
-version = "$major.$minor.5"
+version = '1.0'
 
 repositories {
     mavenCentral()
