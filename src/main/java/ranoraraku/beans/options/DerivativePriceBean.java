@@ -56,6 +56,21 @@ public class DerivativePriceBean implements DerivativePrice {
         return sell;
     }
 
+
+    private Double _breakEven = null;
+    @Override
+    public double getBreakEven() {
+        if (_breakEven == null) {
+            _breakEven = calculator.stockPriceFor(getSell(),this);
+        }
+        return _breakEven;
+    }
+
+    @Override
+    public double calcRisc(double value) {
+        return calculator.stockPriceFor(getSell() - value,this);
+    }
+
     @Override
     public int getOid() {
         return oid;
