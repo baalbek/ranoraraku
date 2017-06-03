@@ -4,6 +4,8 @@ import oahu.financial.Derivative;
 import oahu.financial.StockPrice;
 import oahu.financial.OptionCalculator;
 
+import java.util.Optional;
+
 /**
  * Created by rcs on 13.07.15.
  *
@@ -28,11 +30,11 @@ public class SimpleDerivativePriceBean extends DerivativePriceBean {
     }
 
     @Override
-    public double getIvBuy() {
-        return 0.0;
+    public Optional<Double> getIvBuy() {
+        return Optional.of(0.0);
     }
     @Override
-    public double getIvSell() {
-        return 0.0;
+    public Optional<Double> getIvSell() {
+        return Optional.of(0.0);
     }
 }

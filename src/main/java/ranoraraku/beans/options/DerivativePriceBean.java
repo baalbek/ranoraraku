@@ -7,10 +7,8 @@ import oahu.financial.OptionCalculator;
 import oahu.financial.StockPrice;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
-import java.util.OptionalInt;
 
 /**
  * Created by rcs on 26.09.14.
@@ -136,14 +134,34 @@ public class DerivativePriceBean implements DerivativePrice {
         return ChronoUnit.DAYS.between(dx,x);
     }
 
+    private Optional<Double> _ivBuy = null;
     @Override
-    public double getIvBuy() {
-        return calculator.iv(this,Derivative.BUY);
+    public Optional<Double> getIvBuy() {
+        if (_ivBuy == null) {
+            try {
+                _ivBuy = Optional.of(calculator.iv(this,Derivative.BUY));
+            }
+            catch (BinarySearchException ex) {
+                System.out.println(ex.getMessage());
+                _ivBuy = Optional.empty();
+            }
+        }
+        return _ivBuy;
     }
 
+    private Optional<Double> _ivSell = null;
     @Override
-    public double getIvSell() {
-        return calculator.iv(this,Derivative.SELL);
+    public Optional<Double> getIvSell() {
+        if (_ivSell == null) {
+            try {
+                _ivSell = Optional.of(calculator.iv(this,Derivative.SELL));
+            }
+            catch (BinarySearchException ex) {
+                System.out.println(ex.getMessage());
+                _ivSell = Optional.empty();
+            }
+        }
+        return _ivSell;
     }
 
 
