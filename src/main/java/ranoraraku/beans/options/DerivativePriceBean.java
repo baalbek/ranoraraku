@@ -82,6 +82,11 @@ public class DerivativePriceBean implements DerivativePrice {
     }
 
     @Override
+    public String getTicker() {
+        return derivative == null ? null : derivative.getTicker();
+    }
+
+    @Override
     public Derivative getDerivative() {
         return derivative;
     }

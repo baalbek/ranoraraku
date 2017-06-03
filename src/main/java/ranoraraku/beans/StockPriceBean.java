@@ -101,6 +101,8 @@ public class StockPriceBean implements StockPrice {
 
 
     //region Time
+
+    @Override
     public LocalTime getTm() {
         return tm;
     }
