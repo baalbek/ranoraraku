@@ -72,15 +72,25 @@ public class DerivativePriceBean implements DerivativePrice {
         return _breakEven;
     }
 
+    private double _currentRiscOptionValue;
+    private Optional<Double>  _currentRisc;
     @Override
     public Optional<Double> calcRisc(double value) {
         try {
             Double result = calculator.stockPriceFor(getSell() - value,this);
-            return Optional.of(result);
+            _currentRiscOptionValue = value;
+            _currentRisc = Optional.of(result);
+            return _currentRisc;
         }
         catch (BinarySearchException ex) {
             return Optional.empty();
         }
+    }
+    public double get_currentRiscOptionValue() {
+        return _currentRiscOptionValue;
+    }
+    public Optional<Double> getCurrentRisc(){
+        return _currentRisc;
     }
 
     @Override
