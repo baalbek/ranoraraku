@@ -67,6 +67,7 @@ public class DerivativePriceBean implements DerivativePrice {
             }
         }
         catch (BinarySearchException ex) {
+            System.out.println(String.format("[%s] %s",getTicker(),ex.getMessage()));
             _breakEven = Optional.empty();
         }
         return _breakEven;
@@ -83,6 +84,7 @@ public class DerivativePriceBean implements DerivativePrice {
             return _currentRisc;
         }
         catch (BinarySearchException ex) {
+            System.out.println(String.format("[%s] %s",getTicker(),ex.getMessage()));
             return Optional.empty();
         }
     }
@@ -152,7 +154,7 @@ public class DerivativePriceBean implements DerivativePrice {
                 _ivBuy = Optional.of(calculator.iv(this,Derivative.BUY));
             }
             catch (BinarySearchException ex) {
-                System.out.println(ex.getMessage());
+                System.out.println(String.format("[%s] %s",getTicker(),ex.getMessage()));
                 _ivBuy = Optional.empty();
             }
         }
@@ -167,7 +169,7 @@ public class DerivativePriceBean implements DerivativePrice {
                 _ivSell = Optional.of(calculator.iv(this,Derivative.SELL));
             }
             catch (BinarySearchException ex) {
-                System.out.println(ex.getMessage());
+                System.out.println(String.format("[%s] %s",getTicker(),ex.getMessage()));
                 _ivSell = Optional.empty();
             }
         }
