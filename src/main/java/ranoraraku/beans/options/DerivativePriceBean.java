@@ -74,14 +74,14 @@ public class DerivativePriceBean implements DerivativePrice {
     }
 
     private double _currentRiscOptionValue;
-    private Optional<Double>  _currentRisc;
+    private Optional<Double> _currentRiscStockPrice;
     @Override
     public Optional<Double> stockPriceFor(double optionValue) {
         try {
             Double result = calculator.stockPriceFor(getSell() - optionValue,this);
             _currentRiscOptionValue = optionValue;
-            _currentRisc = Optional.of(result);
-            return _currentRisc;
+            _currentRiscStockPrice = Optional.of(result);
+            return _currentRiscStockPrice;
         }
         catch (BinarySearchException ex) {
             System.out.println(String.format("[%s] %s",getTicker(),ex.getMessage()));
@@ -101,11 +101,12 @@ public class DerivativePriceBean implements DerivativePrice {
     public double getCurrentRiscOptionValue() {
         return _currentRiscOptionValue;
     }
-    public Optional<Double> getCurrentRisc(){
-        if (_currentRisc == null) {
-            _currentRisc = Optional.empty();
+
+    public Optional<Double> getCurrentRiscStockPrice(){
+        if (_currentRiscStockPrice == null) {
+            _currentRiscStockPrice = Optional.empty();
         }
-        return _currentRisc;
+        return _currentRiscStockPrice;
     }
 
     @Override
