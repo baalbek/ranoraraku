@@ -78,7 +78,8 @@ public class DerivativePriceBean implements DerivativePrice {
     @Override
     public Optional<Double> stockPriceFor(double optionValue) {
         try {
-            Double result = calculator.stockPriceFor(getSell() - optionValue,this);
+            //Double result = calculator.stockPriceFor(getSell() - optionValue,this);
+            Double result = calculator.stockPriceFor(optionValue,this);
             _currentRiscOptionValue = optionValue;
             _currentRiscStockPrice = Optional.of(result);
             return _currentRiscStockPrice;
