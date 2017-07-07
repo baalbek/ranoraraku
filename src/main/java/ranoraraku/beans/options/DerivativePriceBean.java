@@ -103,6 +103,11 @@ public class DerivativePriceBean implements DerivativePrice {
         return _currentRiscOptionValue;
     }
 
+    @Override
+    public double getCurrentRisc() {
+        return sell - _currentRiscOptionValue;
+    }
+
     public Optional<Double> getCurrentRiscStockPrice(){
         if (_currentRiscStockPrice == null) {
             _currentRiscStockPrice = Optional.empty();
