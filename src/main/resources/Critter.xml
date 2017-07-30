@@ -5,7 +5,7 @@
 
     <resultMap id="ruleTypeMap" type="ranoraraku.beans.critters.RuleTypeBean">
         <id column="oid" property="oid" />
-        <result column="desc" property="desc" />
+        <result column="description" property="desc" />
     </resultMap>
 
     <select id="ruleTypes" resultMap="ruleTypeMap">
