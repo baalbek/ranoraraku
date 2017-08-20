@@ -8,6 +8,8 @@ import java.time.LocalDate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.time.temporal.ChronoUnit.DAYS;
+
 /**
  * Created with IntelliJ IDEA.
  * User: rcs
@@ -162,6 +164,12 @@ public class DerivativeBean implements Derivative {
         }
         return series;
     }
+
+    @Override
+    public long getDays() {
+        return DAYS.between(LocalDate.now(),expiry);
+    }
+
     public void setSeries(String value) {
         series = value;
     }
