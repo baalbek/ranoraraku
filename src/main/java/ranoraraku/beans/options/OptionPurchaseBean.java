@@ -3,6 +3,7 @@ package ranoraraku.beans.options;
 import oahu.dto.Tuple;
 import oahu.dto.Tuple2;
 import oahu.financial.DerivativePrice;
+import oahu.financial.repository.ChachedEtradeRepository;
 import oahu.financial.repository.EtradeRepository;
 import ranoraraku.beans.critters.CritterBean;
 
@@ -36,8 +37,8 @@ public class OptionPurchaseBean {
     private int purchaseType;
     private double spotAtPurchase;
 
-    private EtradeRepository<Tuple<String>,Tuple2<String,File>> repository;
-
+    // private EtradeRepository<Tuple<String>,Tuple2<String,File>> repository;
+    private ChachedEtradeRepository<Tuple<String>> repository;
     private List<CritterBean> critters;
     private List<OptionSaleBean> sales;
 
@@ -204,11 +205,11 @@ public class OptionPurchaseBean {
 
 
 
-    public EtradeRepository getRepository() {
+    public ChachedEtradeRepository getRepository() {
         return repository;
     }
 
-    public void setRepository(EtradeRepository repository) {
+    public void setRepository(ChachedEtradeRepository repository) {
         this.repository = repository;
     }
     //endregion Properties
