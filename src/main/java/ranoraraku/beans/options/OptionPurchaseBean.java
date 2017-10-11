@@ -3,6 +3,7 @@ package ranoraraku.beans.options;
 import oahu.dto.Tuple;
 import oahu.dto.Tuple2;
 import oahu.financial.DerivativePrice;
+import oahu.financial.StockPrice;
 import oahu.financial.repository.ChachedEtradeRepository;
 import oahu.financial.repository.EtradeRepository;
 import ranoraraku.beans.critters.CritterBean;
@@ -218,7 +219,9 @@ public class OptionPurchaseBean {
     public Optional<DerivativePrice> getDerivativePrice() {
         return repository.findDerivativePrice(new Tuple<>(ticker,optionName));
     }
-
+    public Optional<StockPrice>  getSpot() {
+        return repository.findSpot(ticker);
+    }
     private Double _watermark = null;
     public Double getWatermark() {
         Optional<DerivativePrice> curDeriv = getDerivativePrice();
