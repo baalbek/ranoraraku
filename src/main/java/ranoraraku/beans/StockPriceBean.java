@@ -133,6 +133,14 @@ public class StockPriceBean implements StockPrice {
 
 
     @Override
+    public String toString() {
+        return String.format("[%s] dx: %s, tm: %s",
+                stock == null ? "-" :stock.getTicker(),
+                localDx,
+                tm);
+    }
+
+    @Override
     public double getOpn() {
         return opn;
     }
