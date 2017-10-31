@@ -1,17 +1,14 @@
 package ranoraraku.beans.options;
 
 import oahu.dto.Tuple;
-import oahu.dto.Tuple2;
 import oahu.financial.DerivativePrice;
 import oahu.financial.StockPrice;
 import oahu.financial.repository.ChachedEtradeRepository;
-import oahu.financial.repository.EtradeRepository;
 import ranoraraku.beans.critters.CritterBean;
 
-import java.io.File;
+import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 

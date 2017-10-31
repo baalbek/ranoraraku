@@ -61,8 +61,18 @@
         select * from stockmarket.critter where purchase_id=#{value} and status=7
         order by oid
     </select>
+
+    <!--
+    table OPTIONSALE
+    oid | purchase_id |     dx     | price | volume | status | transaction_cost
+    11 |          28 | 2017-10-17 |  1.05 |     10 |      0 |             0.00
+    -->
+
     <resultMap id="salesMap" type="ranoraraku.beans.options.OptionSaleBean">
         <id column="oid" property="oid"/>
+        <id column="dx" property="dx"/>
+        <id column="price" property="price"/>
+        <id column="volume" property="volume"/>
     </resultMap>
 
     <select id="getSales" resultMap="salesMap">
@@ -112,6 +122,32 @@
         join stockmarket.optionx d on d.oid=o.opid
         join stockmarket.stocktickers s on s.oid=d.stock_id
         where o.status=1 and o.purchase_type=#{purchaseType}
+        order by s.oid,o.dx
+    </select>
+
+    <resultMap id="purchaseWithSalesMap" type="ranoraraku.beans.options.OptionPurchaseBean">
+        <id column="oid" property="oid"/>
+        <result column="dx" property="dx"/>
+        <result column="price" property="price"/>
+        <result column="buy" property="buyAtPurchase"/>
+        <result column="spot" property="spotAtPurchase"/>
+        <result column="volume" property="volume"/>
+        <result column="status" property="status"/>
+        <result column="ticker" property="ticker"/>
+        <result column="opid" property="optionId"/>
+        <result column="opname" property="optionName"/>
+        <result column="optype" property="optionType"/>
+        <collection column="oid"
+                    property="sales"
+                    select="getSales"
+                    ofType="ranoraraku.beans.options.OptionSaleBean"
+                    javaType="java.util.ArrayList"/>
+    </resultMap>
+    <select id="activePurchasesWithSales" resultMap="purchaseWithSalesMap">
+        select o.*,s.ticker,d.opname,d.optype from stockmarket.optionpurchase o
+        join stockmarket.optionx d on d.oid=o.opid
+        join stockmarket.stocktickers s on s.oid=d.stock_id
+        where o.status=#{status} and o.purchase_type=#{purchaseType}
         order by s.oid,o.dx
     </select>
 
