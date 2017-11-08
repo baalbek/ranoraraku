@@ -12,6 +12,8 @@
         select * from stockmarket.rule_types order by oid
     </select>
 
+
+    <!--
     <resultMap id="denyRuleMap" type="ranoraraku.beans.critters.DenyRuleBean">
         <id column="oid" property="oid"/>
         <result column="value" property="denyValue" />
@@ -62,11 +64,9 @@
         order by oid
     </select>
 
-    <!--
     table OPTIONSALE
     oid | purchase_id |     dx     | price | volume | status | transaction_cost
     11 |          28 | 2017-10-17 |  1.05 |     10 |      0 |             0.00
-    -->
 
     <resultMap id="salesMap" type="ranoraraku.beans.options.OptionSaleBean">
         <id column="oid" property="oid"/>
@@ -79,6 +79,7 @@
         select * from stockmarket.optionsale where purchase_id=#{value}
         order by oid
     </select>
+    -->
 
     <resultMap id="purchaseResultMap" type="ranoraraku.beans.options.OptionPurchaseBean">
         <id column="oid" property="oid"/>
@@ -107,16 +108,20 @@
                 <result column="a_value" property="accValue" />
                 <result column="a_rtyp" property="rtyp" />
                 <result column="a_active" property="active" />
+                <result column="a_rtyp_desc" property="rtypDesc" />
+                <collection column="a_oid"
+                            property="denyRules"
+                            ofType="ranoraraku.beans.critters.DenyRuleBean"
+                            javaType="java.util.ArrayList">
+                    <id column="d_oid" property="oid"/>
+                    <result column="d_value" property="denyValue" />
+                    <result column="d_rtyp" property="rtyp" />
+                    <result column="d_rtyp_desc" property="rtypDesc" />
+                    <result column="d_active" property="active" />
+                    <result column="d_has_memory" property="memory" />
+                </collection>
             </collection>
         </collection>
-        <!--
-                <result column="a_rtyp_desc" property="rtypDesc" />
-        <collection property="sales"
-                    column="oid"
-                    ofType="ranoraraku.beans.options.OptionSaleBean"
-                    javaType="java.util.ArrayList">
-        </collection>
-        -->
     </resultMap>
 
     <!--
@@ -138,7 +143,7 @@
         select o.*,s.ticker,d.opname,d.optype,
         cr.oid as c_oid,cr.sell_vol as c_sell_vol,cr.purchase_id as c_purchase_id,
         acc.oid as a_oid,acc.value as a_value,acc.rtyp as a_rtyp,acc.value as a_value,ar.description as a_rtyp_desc,acc.active as a_active,
-        dny.oid as d_oid,dny.value as d_value,dny.rtyp as d_rtyp,dny.active as d_active,dny.has_memory as d_has_memory,ad.description as d_rtyp_desc
+        dny.oid as d_oid,dny.value as d_value,dny.rtyp as d_rtyp,dny.active as d_active,dny.has_memory as d_has_memory,dr.description as d_rtyp_desc
         from stockmarket.optionpurchase o
         join stockmarket.optionx d on d.oid=o.opid
         join stockmarket.stocktickers s on s.oid=d.stock_id
@@ -146,9 +151,9 @@
         left outer join stockmarket.accept_rules acc on acc.cid=cr.oid
         left outer join stockmarket.rule_types ar on ar.oid=acc.rtyp
         left outer join stockmarket.deny_rules dny on dny.group_id=acc.oid
-        left outer join stockmarket.rule_types ad on ad.oid=dny.rtyp
+        left outer join stockmarket.rule_types dr on dr.oid=dny.rtyp
         where o.status=1 and o.purchase_type=#{purchaseType}
-        order by s.oid,o.dx;
+        order by s.oid,o.dx
     </select>
 
     <resultMap id="purchaseWithSalesMap" type="ranoraraku.beans.options.OptionPurchaseBean">
