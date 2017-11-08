@@ -92,18 +92,34 @@
         <result column="opid" property="optionId"/>
         <result column="opname" property="optionName"/>
         <result column="optype" property="optionType"/>
-        <collection column="oid"
-                    property="critters"
-                    select="getCritters"
+        <collection property="critters" 
+                    column="oid"
                     ofType="ranoraraku.beans.critters.CritterBean"
-                    javaType="java.util.ArrayList"/>
-        <collection column="oid"
-                    property="sales"
-                    select="getSales"
+                    javaType="java.util.ArrayList">
+            <id column="c_oid" property="oid"/>
+            <result column="c_sell_vol" property="sellVolume" />
+            <result column="c_purchase_id" property="purchaseId" />
+            <collection column="c_oid"
+                        property="acceptrules"
+                        ofType="ranoraraku.beans.critters.AcceptRuleBean"
+                        javaType="java.util.ArrayList">
+                <id column="a_oid" property="oid"/>
+                <result column="a_value" property="accValue" />
+                <result column="a_rtyp" property="rtyp" />
+                <result column="a_active" property="active" />
+            </collection>
+        </collection>
+        <!--
+                <result column="a_rtyp_desc" property="rtypDesc" />
+        <collection property="sales"
+                    column="oid"
                     ofType="ranoraraku.beans.options.OptionSaleBean"
-                    javaType="java.util.ArrayList"/>
+                    javaType="java.util.ArrayList">
+        </collection>
+        -->
     </resultMap>
 
+    <!--
     <select id="activePurchases" resultMap="purchaseResultMap">
         select o.*,s.ticker,d.oid,d.opname,d.optype from stockmarket.optionpurchase o
         join stockmarket.optionx d on d.oid=o.opid
@@ -116,13 +132,23 @@
         </foreach>
         order by o.dx
     </select>
+    -->
 
     <select id="activePurchasesAll" resultMap="purchaseResultMap">
-        select o.*,s.ticker,d.opname,d.optype from stockmarket.optionpurchase o
+        select o.*,s.ticker,d.opname,d.optype,
+        cr.oid as c_oid,cr.sell_vol as c_sell_vol,cr.purchase_id as c_purchase_id,
+        acc.oid as a_oid,acc.value as a_value,acc.rtyp as a_rtyp,acc.value as a_value,ar.description as a_rtyp_desc,acc.active as a_active,
+        dny.oid as d_oid,dny.value as d_value,dny.rtyp as d_rtyp,dny.active as d_active,dny.has_memory as d_has_memory,ad.description as d_rtyp_desc
+        from stockmarket.optionpurchase o
         join stockmarket.optionx d on d.oid=o.opid
         join stockmarket.stocktickers s on s.oid=d.stock_id
+        left outer join stockmarket.critter cr on cr.purchase_id=o.oid and cr.status=7
+        left outer join stockmarket.accept_rules acc on acc.cid=cr.oid
+        left outer join stockmarket.rule_types ar on ar.oid=acc.rtyp
+        left outer join stockmarket.deny_rules dny on dny.group_id=acc.oid
+        left outer join stockmarket.rule_types ad on ad.oid=dny.rtyp
         where o.status=1 and o.purchase_type=#{purchaseType}
-        order by s.oid,o.dx
+        order by s.oid,o.dx;
     </select>
 
     <resultMap id="purchaseWithSalesMap" type="ranoraraku.beans.options.OptionPurchaseBean">
@@ -137,7 +163,10 @@
         <result column="opid" property="optionId"/>
         <result column="opname" property="optionName"/>
         <result column="optype" property="optionType"/>
-	    <collection property="sales" column="oid" javaType="ArrayList" ofType="ranoraraku.beans.options.OptionSaleBean">
+        <collection property="sales" 
+                    column="oid" 
+                    javaType="ArrayList" 
+                    ofType="ranoraraku.beans.options.OptionSaleBean">
 	    	<id property="oid" column="s_oid"/>
 	    	<result property="dx" column="s_dx"/>
 	    	<result property="price" column="s_price"/>
