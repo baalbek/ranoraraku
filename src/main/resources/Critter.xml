@@ -168,6 +168,11 @@
         <result column="opid" property="optionId"/>
         <result column="opname" property="optionName"/>
         <result column="optype" property="optionType"/>
+	    <association property="myDerivative" column="oid" javaType="ranoraraku.beans.options.DerivativeBean">
+	    	<id property="oid" column="d_oid"/>
+			<result property="expirySql" column="exp_date"/>
+			<result property="x" column="strike"/>
+	    </association>
         <collection property="sales" 
                     column="oid" 
                     javaType="ArrayList" 
@@ -179,7 +184,8 @@
         </collection>
     </resultMap>
     <select id="activePurchasesWithSales" resultMap="purchaseWithSalesMap">
-        select o.*,s.ticker,d.opname,d.optype,x.oid as s_oid,x.dx as s_dx,x.price as s_price,x.volume as s_volume 
+        select o.*,s.ticker,d.oid as d_oid,d.opname,d.exp_date,d.optype,d.strike,
+        x.oid as s_oid,x.dx as s_dx,x.price as s_price,x.volume as s_volume 
         from stockmarket.optionpurchase o
         join stockmarket.optionx d on d.oid=o.opid
         join stockmarket.stocktickers s on s.oid=d.stock_id

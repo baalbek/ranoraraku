@@ -39,12 +39,10 @@ public class DerivativeBean implements Derivative {
         setStock(stock);
     }
 
+    /*
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder(getTicker());
-        /*
-        buf.append("\n\tParent: ").append(parent == null ? "none" : "parent") // parent.getTicker())
-        */
            buf.append("\n\texpiry: ").append(getExpiry())
            .append("\n\toption type: ").append(getOpType() == OptionType.CALL ? "apply" : "put")
            .append("\n\tx: ").append(getX())
@@ -52,9 +50,9 @@ public class DerivativeBean implements Derivative {
            //.append("\n\tsell ").append(getSell())
            .append("\n\tseries ").append(getSeries());
            //.append("\n\twatermark ").append(getWatermark());
-        //*/
         return buf.toString();
     }
+    //*/
 
     //--------------------------------------------------
     //------------- Parent
