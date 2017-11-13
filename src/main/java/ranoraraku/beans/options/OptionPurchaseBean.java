@@ -1,8 +1,10 @@
 package ranoraraku.beans.options;
 
 import oahu.dto.Tuple;
+import oahu.exceptions.BinarySearchException;
 import oahu.financial.Derivative;
 import oahu.financial.DerivativePrice;
+import oahu.financial.OptionCalculator;
 import oahu.financial.StockPrice;
 import oahu.financial.repository.ChachedEtradeRepository;
 import ranoraraku.beans.critters.CritterBean;
@@ -21,6 +23,7 @@ import java.util.Optional;
  */
 public class OptionPurchaseBean {
     //region Init
+    private OptionCalculator calculator;
     private int oid;
     private LocalDate localDx;
     private int status;
@@ -35,7 +38,7 @@ public class OptionPurchaseBean {
     private int optionId;
     private int purchaseType;
     private double spotAtPurchase;
-    private Derivative myDerivative;
+    //private Derivative myDerivative;
 
     // private EtradeRepository<Tuple<String>,Tuple2<String,File>> repository;
     private ChachedEtradeRepository<Tuple<String>> repository;
@@ -111,6 +114,51 @@ public class OptionPurchaseBean {
     }
 
     //endregion Dates
+    //--------------------------------------------------
+    //------------- Expiry
+    //--------------------------------------------------
+    private LocalDate expiry;
+    public LocalDate getExpiry() {
+        return expiry;
+    }
+
+    public Date getExpirySql() {
+        return Date.valueOf(expiry);
+    }
+
+    public void setExpirySql(Date expirySql) {
+        this.expiry = expirySql.toLocalDate();
+    }
+    //--------------------------------------------------
+    //------------- X
+    //--------------------------------------------------
+    private double x;
+    public double getX() {
+        return x;
+    }
+
+    public void setX(double value) {
+        x = value;
+    }
+    //--------------------------------------------------
+    //------------- ivBuy
+    //--------------------------------------------------
+    /*
+    private Optional<Double> _ivBuy = null;
+    public Optional<Double> getIvBuy() {
+        if (_ivBuy == null) {
+            try {
+                //_ivBuy = Optional.of(calculator.iv(this,Derivative.BUY));
+            }
+            catch (BinarySearchException ex) {
+                System.out.println(String.format("[%s] %s",getTicker(),ex.getMessage()));
+                _ivBuy = Optional.empty();
+            }
+        }
+        return _ivBuy;
+    }
+    //*/
+
 
     public int getStatus() {
         return status;
@@ -246,12 +294,17 @@ public class OptionPurchaseBean {
         return _watermark;
     }
 
+    /*
     public Derivative getMyDerivative() {
         return myDerivative;
     }
 
     public void setMyDerivative(Derivative myDerivative) {
         this.myDerivative = myDerivative;
+    }
+    //*/
+    public void setCalculator(OptionCalculator calculator) {
+        this.calculator = calculator;
     }
 
 

@@ -24,7 +24,7 @@ public interface CritterMapper {
 
     List<OptionPurchaseBean> activePurchasesAll(@Param("purchaseType") int purchaseType);
 
-    List<OptionPurchaseBean> activePurchasesWithSales(@Param("stockId") int stockId,
+    List<OptionPurchaseBean> purchasesWithSales(@Param("stockId") int stockId,
                                                       @Param("purchaseType") int purchaseType,
                                                       @Param("status") int status,
                                                       @Param("optype") String optype);

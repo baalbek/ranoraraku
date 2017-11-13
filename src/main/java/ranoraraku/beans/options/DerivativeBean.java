@@ -180,9 +180,6 @@ public class DerivativeBean implements Derivative {
     public double getX() {
         return x;
     }
-
-
-
     public void setX(double value) {
         x = value;
     }
