@@ -213,6 +213,10 @@
         from stockmarket.optionx where opname=#{value}
     </select>
 
+    <select id="findDerivativeId" resultType="Integer" parameterType="string">
+        select oid from stockmarket.optionx where opname=#{value}
+    </select>
+
     <select id="findSpotId" resultType="Integer" parameterType="ranoraraku.beans.StockPriceBean">
         select oid from stockmarket.spot where stock_id=#{stockId} and dx=#{dx} and tm=#{sqlTime}
     </select>

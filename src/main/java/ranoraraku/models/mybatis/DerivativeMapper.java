@@ -32,6 +32,8 @@ public interface DerivativeMapper {
 
     Integer findSpotId(StockPriceBean s);
 
+    Integer findDerivativeId(String ticker);
+
     DerivativeBean findDerivative(String ticker);
 
     /*
