@@ -13,74 +13,6 @@
     </select>
 
 
-    <!--
-    <resultMap id="denyRuleMap" type="ranoraraku.beans.critters.DenyRuleBean">
-        <id column="oid" property="oid"/>
-        <result column="value" property="denyValue" />
-        <result column="rtyp" property="rtyp" />
-        <result column="rtyp_desc" property="rtypDesc" />
-        <result column="active" property="active" />
-        <result column="has_memory" property="memory" />
-    </resultMap>
-
-
-    <select id="getDenyRules" resultMap="denyRuleMap">
-        select d.*,r.description as rtyp_desc from stockmarket.deny_rules d
-        join stockmarket.rule_types r on r.oid=d.rtyp where d.group_id=#{value}
-    </select>
-
-
-    <resultMap id="accRuleMap" type="ranoraraku.beans.critters.AcceptRuleBean">
-        <id column="oid" property="oid"/>
-        <result column="value" property="accValue" />
-        <result column="rtyp" property="rtyp" />
-        <result column="rtyp_desc" property="rtypDesc" />
-        <result column="active" property="active" />
-        <collection column="oid"
-                    property="denyRules"
-                    select="getDenyRules"
-                    ofType="ranoraraku.beans.critters.DenyRuleBean"
-                    javaType="java.util.ArrayList"/>
-    </resultMap>
-
-    <select id="getAccRules" resultMap="accRuleMap">
-        select a.*,r.description as rtyp_desc from stockmarket.accept_rules a join
-        stockmarket.rule_types r on r.oid=a.rtyp where a.cid=#{value}
-    </select>
-
-    <resultMap id="critterMap" type="ranoraraku.beans.critters.CritterBean">
-        <id column="oid" property="oid"/>
-        <result column="sell_vol" property="sellVolume" />
-        <result column="purchase_id" property="purchaseId" />
-        <collection column="oid"
-                    property="acceptrules"
-                    select="getAccRules"
-                    ofType="ranoraraku.beans.critters.AcceptRuleBean"
-                    javaType="java.util.ArrayList"/>
-    </resultMap>
-
-    <select id="getCritters" resultMap="critterMap">
-        select * from stockmarket.critter where purchase_id=#{value} and status=7
-        order by oid
-    </select>
-
-    table OPTIONSALE
-    oid | purchase_id |     dx     | price | volume | status | transaction_cost
-    11 |          28 | 2017-10-17 |  1.05 |     10 |      0 |             0.00
-
-    <resultMap id="salesMap" type="ranoraraku.beans.options.OptionSaleBean">
-        <id column="oid" property="oid"/>
-        <id column="dx" property="dx"/>
-        <id column="price" property="price"/>
-        <id column="volume" property="volume"/>
-    </resultMap>
-
-    <select id="getSales" resultMap="salesMap">
-        select * from stockmarket.optionsale where purchase_id=#{value}
-        order by oid
-    </select>
-    -->
-
     <resultMap id="purchaseResultMap" type="ranoraraku.beans.options.OptionPurchaseBean">
         <id column="oid" property="oid"/>
         <result column="dx" property="dx"/>
@@ -123,21 +55,6 @@
             </collection>
         </collection>
     </resultMap>
-
-    <!--
-    <select id="activePurchases" resultMap="purchaseResultMap">
-        select o.*,s.ticker,d.oid,d.opname,d.optype from stockmarket.optionpurchase o
-        join stockmarket.optionx d on d.oid=o.opid
-        join stockmarket.stocktickers s on s.oid=d.stock_id
-        where o.status=1 and o.purchase_type=#{purchaseType}
-        and s.oid in
-        <foreach item="item" index="index" collection="tickerIds"
-                 open="(" separator="," close=")">
-            #{item}
-        </foreach>
-        order by o.dx
-    </select>
-    -->
 
     <select id="activePurchasesAll" resultMap="purchaseResultMap">
         select o.*,s.ticker,d.opname,d.optype,
@@ -195,6 +112,19 @@
         join stockmarket.stocktickers s on s.oid=d.stock_id
         left outer join stockmarket.optionsale x on x.purchase_id=o.oid
         where d.stock_id=#{stockId} and o.status=#{status} and o.purchase_type=#{purchaseType}
+        <if test="optype != null">
+            and d.optype=#{optype}
+        </if>
+        order by s.oid,o.dx
+    </select>
+    <select id="purchasesWithSalesAll" resultMap="purchaseWithSalesMap">
+        select o.*,s.ticker,d.oid as d_oid,d.opname,d.exp_date,d.optype,d.strike,
+        x.oid as s_oid,x.dx as s_dx,x.price as s_price,x.volume as s_volume 
+        from stockmarket.optionpurchase o
+        join stockmarket.optionx d on d.oid=o.opid
+        join stockmarket.stocktickers s on s.oid=d.stock_id
+        left outer join stockmarket.optionsale x on x.purchase_id=o.oid
+        where o.status=#{status} and o.purchase_type=#{purchaseType}
         <if test="optype != null">
             and d.optype=#{optype}
         </if>
